@@ -5,25 +5,23 @@ import (
 )
 
 // Node presents one element of stack
-type Node struct {
-	prev *Node
-	Data interface{}
+type Node[T any] struct {
+	prev *Node[T]
+	Data T
 }
 
 // Stack presents classic LIFO stack
-type Stack struct {
-	top    *Node
+type Stack[T any] struct {
+	top    *Node[T]
 	length int
 }
 
 // Push add new element to end
-func (s *Stack) Push(el *Node) {
-	if el == nil {
-		return
-	}
+func (s *Stack[T]) Push(el T) {
+	n := &Node[T]{Data: el}
 
-	el.prev = s.top
-	s.top = el
+	n.prev = s.top
+	s.top = n
 
 	s.length++
 }
@@ -32,7 +30,7 @@ func (s *Stack) Push(el *Node) {
 const emptyStack = "[]"
 
 // String returns string of all elements
-func (s Stack) String() string {
+func (s Stack[T]) String() string {
 	if s.IsEmpty() {
 		return emptyStack
 	}
@@ -49,37 +47,37 @@ func (s Stack) String() string {
 }
 
 // Pop remove one element from prev
-func (s *Stack) Pop() {
+func (s *Stack[T]) Pop() T {
+	val := *new(T)
 	if s.IsEmpty() {
-		return
+		return val
 	}
+	val = s.top.Data
 	s.top = s.top.prev
 	s.length--
+
+	return val
 }
 
 // IsEmpty returns result of empty stack check
-func (s Stack) IsEmpty() bool {
+func (s Stack[T]) IsEmpty() bool {
 	return s.length == 0
 }
 
 func main() {
-	var stack Stack
+	var stack Stack[string]
 
-	el1 := Node{Data: "!"}
-	el2 := Node{Data: "world"}
-	el3 := Node{Data: "Hello"}
-
-	stack.Push(&el1)
-	stack.Push(&el2)
-	stack.Push(&el3)
+	stack.Push("one")
+	stack.Push("two")
+	stack.Push("three")
 
 	fmt.Printf("STACK WITH 3 ELEMENTS: %+v\n", stack)
 	fmt.Printf("STACK WITH IS EMPTY: %+v\n", stack.IsEmpty())
 
-	stack.Pop()
+	el1 := stack.Pop()
+	fmt.Printf("STACK RETURNED ONE ELEMENT: %+v\n", el1)
 	stack.Pop()
 	fmt.Printf("STACK WITH 1 ELEMENT: %+v\n", stack)
 	stack.Pop()
 	fmt.Printf("STACK WITH IS EMPTY: %+v\n", stack.IsEmpty())
-
 }
